@@ -9,6 +9,7 @@ A script that monitors login failures and automatically blacklists IP addresses 
 - Blacklists IP addresses that exceed a certain number of failed login attempts.
 - Configurable parameters such as time window, failure threshold, and blacklist timeout.
 - Automatically updates the MikroTik firewall address list with blacklisted IPs.
+- Configurable handling of MAC addresses detected in the logs.
 
 ## Installation
 
@@ -31,6 +32,20 @@ Run the script periodically using the RouterOS scheduler to monitor login attemp
 ```shell
 /system scheduler add name="Login Failure Detector" interval=1m on-event="/system script run login_failure_detector"
 ```
+
+## Firewall Rule
+
+To block traffic from IPs in the blacklist, add the following rule to your MikroTik firewall. Make sure to place it at the beginning of the input chain to ensure it is processed first:
+
+```bash
+/ip firewall filter add action=drop chain=input src-address-list=blacklist
+```
+
+This rule will drop incoming traffic from IP addresses that are added to the `blacklist` address list.
+
+## MAC Address Handling
+
+The script currently skips MAC addresses from the log entries. If you would like to implement additional handling for MAC addresses, you can modify the script to include MAC address blocking or any other desired behavior.
 
 ## Configuration Example
 
